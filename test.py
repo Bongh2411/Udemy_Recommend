@@ -43,22 +43,22 @@ def get_recommendations(title,df ,cosine_sim,courses,number):
 # svd = SVD(verbose=True, n_epochs=10)
 # trainset = data.build_full_trainset()
 # svd.fit(trainset)
-def generate_recommendation_3(user_id, svd, df_review, thresh=4,number_of_rec):
-  iids=df_review['course_id'].unique()
-  iids_user=df_review.loc[df_review['user_id']==user_id,'course_id']
-  iids_to_pred = np.setdiff1d(iids,iids_user)
-  dict_re = {'uid':[],'iid':[],'est':[]}
-  for iid in iids_to_pred:
-    pred=svd.predict(uid = user_id, iid = iid)
-    if pred.est >=thresh:
-      dict_re['uid'].append(pred.uid)
-      dict_re['iid'].append(pred.iid)
-      dict_re['est'].append(pred.est)
-  df_re = pd.DataFrame.from_dict(dict_re)
-  df_re= df_re.sort_values(by='est', ascending=False).head(number_of_rec)
-  # recommend 10 course
-  df_recommend = df_re.merge(df_review, left_on="iid", right_on="course_id")[["avg_rating","title","amount","Link","image_480x270"]]
-  return df_recommend
+# def generate_recommendation_3(user_id, svd, df_review, thresh=4,number_of_rec):
+#   iids=df_review['course_id'].unique()
+#   iids_user=df_review.loc[df_review['user_id']==user_id,'course_id']
+#   iids_to_pred = np.setdiff1d(iids,iids_user)
+#   dict_re = {'uid':[],'iid':[],'est':[]}
+#   for iid in iids_to_pred:
+#     pred=svd.predict(uid = user_id, iid = iid)
+#     if pred.est >=thresh:
+#       dict_re['uid'].append(pred.uid)
+#       dict_re['iid'].append(pred.iid)
+#       dict_re['est'].append(pred.est)
+#   df_re = pd.DataFrame.from_dict(dict_re)
+#   df_re= df_re.sort_values(by='est', ascending=False).head(number_of_rec)
+#   # recommend 10 course
+#   df_recommend = df_re.merge(df_review, left_on="iid", right_on="course_id")[["avg_rating","title","amount","Link","image_480x270"]]
+#   return df_recommend
 
 RESULT_TEMP = """
     <div style="width:70%;height:100%;margin:1px;padding:5px;position:relative;border-radius:5px;border-bottom-right-radius: 50px;
