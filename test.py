@@ -36,30 +36,30 @@ def get_recommendations(title,df ,cosine_sim,courses,number):
 
     # Return the top 10 most similar course
     return df[["avg_rating","title","amount","Link","image_480x270"]].iloc[course_indices]
-# SVD
-reader = Reader(rating_scale=(1, 5))
-df_review = load_data("data_collaborative.csv")
-data = Dataset.load_from_df(df_review[['user_id','course_id','rating']], reader)
-svd = SVD(verbose=True, n_epochs=10)
-trainset = data.build_full_trainset()
-svd.fit(trainset)
+# # SVD
+# reader = Reader(rating_scale=(1, 5))
+# df_review = load_data("data_collaborative.csv")
+# data = Dataset.load_from_df(df_review[['user_id','course_id','rating']], reader)
+# svd = SVD(verbose=True, n_epochs=10)
+# trainset = data.build_full_trainset()
+# svd.fit(trainset)
 
-def generate_recommendation_3(user_id, svd, df_review, number_of_rec, thresh=4):
-    iids=df_review['course_id'].unique()
-    iids_user=df_review.loc[df_review['user_id']==user_id,'course_id']
-    iids_to_pred = np.setdiff1d(iids,iids_user)
-    dict_re = {'uid':[],'iid':[],'est':[]}
-    for iid in iids_to_pred:
-        pred=svd.predict(uid = user_id, iid = iid)
-        if pred.est >=thresh:
-            dict_re['uid'].append(pred.uid)
-            dict_re['iid'].append(pred.iid)
-            dict_re['est'].append(pred.est)
-    df_re = pd.DataFrame.from_dict(dict_re)
-    df_re= df_re.sort_values(by='est', ascending=False).head(number_of_rec)
-    # recommend 10 course
-    df_recommend = df_re.merge(df_review, left_on="iid", right_on="course_id")[["avg_rating","title","amount","Link","image_480x270"]]
-    return df_recommend
+# def generate_recommendation_3(user_id, svd, df_review, number_of_rec, thresh=4):
+#     iids=df_review['course_id'].unique()
+#     iids_user=df_review.loc[df_review['user_id']==user_id,'course_id']
+#     iids_to_pred = np.setdiff1d(iids,iids_user)
+#     dict_re = {'uid':[],'iid':[],'est':[]}
+#     for iid in iids_to_pred:
+#         pred=svd.predict(uid = user_id, iid = iid)
+#         if pred.est >=thresh:
+#             dict_re['uid'].append(pred.uid)
+#             dict_re['iid'].append(pred.iid)
+#             dict_re['est'].append(pred.est)
+#     df_re = pd.DataFrame.from_dict(dict_re)
+#     df_re= df_re.sort_values(by='est', ascending=False).head(number_of_rec)
+#     # recommend 10 course
+#     df_recommend = df_re.merge(df_review, left_on="iid", right_on="course_id")[["avg_rating","title","amount","Link","image_480x270"]]
+#     return df_recommend
 
 RESULT_TEMP = """
     <div style="width:70%;height:100%;margin:1px;padding:5px;position:relative;border-radius:5px;border-bottom-right-radius: 50px;
@@ -100,7 +100,7 @@ def main():
         st.subheader("Recommend Courses")
         cosine_mat = tfd_vectorizer_cosine(df)
         search_term= st.text_input("Search")
-        user_id = df_review[df_review['title'] == search_term]['user_id'][1]
+#         user_id = df_review[df_review['title'] == search_term]['user_id'][1]
         number_of_rec=st.sidebar.number_input("Number",3,10,5) #cairosvg
         if st.button("Recommnend"):
             if search_term is not None:
@@ -119,20 +119,20 @@ def main():
                             url_image,
                             width=500,  # Manually Adjust the width of the image as per requirement
                         )
-                    result1 = generate_recommendation_3(user_id=user_id, svd=svd, df_review=df_review,number_of_rec=number_of_rec, thresh=4)
-                    st.subheader("Students Also Bought")
-                    for row in result1.iterrows():
-                        rec_title = row[1][1]
-                        rec_rating = row[1][0]
-                        rec_url = row[1][3]
-                        rec_price = row[1][2]
-                        # st.write("Title",rec_title,)
-                        stc.html(RESULT_TEMP.format(rec_title, rec_rating, rec_url, rec_price), height=200)
-                        url_image = row[1][4]
-                        st.image(
-                            url_image,
-                            width=500,  # Manually Adjust the width of the image as per requirement
-                        )
+#                     result1 = generate_recommendation_3(user_id=user_id, svd=svd, df_review=df_review,number_of_rec=number_of_rec, thresh=4)
+#                     st.subheader("Students Also Bought")
+#                     for row in result1.iterrows():
+#                         rec_title = row[1][1]
+#                         rec_rating = row[1][0]
+#                         rec_url = row[1][3]
+#                         rec_price = row[1][2]
+#                         # st.write("Title",rec_title,)
+#                         stc.html(RESULT_TEMP.format(rec_title, rec_rating, rec_url, rec_price), height=200)
+#                         url_image = row[1][4]
+#                         st.image(
+#                             url_image,
+#                             width=500,  # Manually Adjust the width of the image as per requirement
+#                         )
                 except:
                     result = "Not Found"
                     st.warning(result)
